@@ -39,7 +39,7 @@
 - **Estado:** 🔒 En curso: propuesta escrita, esperando la revisión del usuario
 - **Asignado a:** Claude Code (propuesta) + usuario (aprobación)
 - **Criterio de cierre:** El usuario aprueba (o ajusta) `docs/arquitectura.md` y la decisión queda en "🧭 Decisiones clave".
-- **Siguiente paso concreto:** El usuario responde las preguntas de la sección 8 de `docs/arquitectura.md`.
+- **Siguiente paso concreto:** El usuario responde las preguntas 1 (stack) y 2 (`src/` → `apps/` + `packages/`) de la sección 8 de `docs/arquitectura.md`. Las preguntas 3 y 4 ya están resueltas: desarrollo local.
 - **Bloqueos / dependencias:** Aprobación del usuario.
 
 ## 📋 Backlog (tasks futuras)
@@ -48,6 +48,7 @@
 |-------|------|-----------|------------|-------|
 | T-002 | Completar las convenciones de la sección 6 de `CLAUDE.md` (idioma, ramas, commits) | Alta | — | El idioma de facto es el español |
 | T-008 | Definir el modelo de dominio y los estados de pedido, pago y envío | Alta | — | Fase 0. Depende de T-006 |
+| T-009 | Revisar el hosting y los costos antes del lanzamiento | Baja | — | Ver la sección 9 de `docs/arquitectura.md` |
 | T-007 | Guardar la grabación de referencia en el repo o un resumen de sus pantallas | Media | — | Hoy es solo un adjunto de la sesión |
 | T-003 | Escribir el PRD inicial en `docs/` a partir de `docs/master-prompt.md` | Media | — | — |
 | T-004 | Actualizar la tabla de estructura de `CLAUDE.md` (`SKILLS.md`, `CONTEXT.md`, `.claude/skills/`) | Baja | — | — |
@@ -83,6 +84,7 @@
 - 2026-11-10 — La memoria entre sesiones vive en `CONTEXT.md` y los procedimientos en `SKILLS.md`.
 - 2026-11-10 — Dirección visual original, en tema oscuro, sin usar la marca, los textos ni los recursos de Depop.
 - 2026-11-10 — Fase 1 = un flujo de punta a punta antes de ampliar las funcionalidades.
+- 2026-11-10 — Desarrollo 100 % local (costo USD 0). El hosting se revisa antes del lanzamiento; estimación inicial: ~USD 55–75/mes + USD 99/año de Apple (ver `docs/arquitectura.md`, sección 9).
 
 ## ❓ Preguntas abiertas
 

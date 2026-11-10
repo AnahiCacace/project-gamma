@@ -104,5 +104,19 @@ Cada paso se hace en commits chicos, con tu aprobación según `CLAUDE.md`.
 
 1. **¿Apruebas la opción A** (Expo + Next.js + API en TypeScript + Supabase)? ¿O prefieres B (solo Expo, más simple pero con menos SEO)?
 2. **¿Reemplazamos `src/` por `apps/` + `packages/`?**
-3. **Hosting:** ¿tienes preferencia o restricciones de presupuesto? Si no, propongo Vercel (web) + Fly.io (API) + Supabase.
-4. **¿Ya tienes cuenta de Apple Developer?** No hace falta hasta publicar o probar en un iPhone real; el simulador alcanza para empezar.
+3. ~~**Hosting**~~ → **Decidido (2026-11-10): desarrollo 100 % local por ahora**, con costo USD 0. El hosting y sus costos se revisan antes del lanzamiento (ver la sección 9).
+4. ~~**Apple Developer**~~ → No hace falta mientras el desarrollo sea local (ver la sección 9).
+
+## 9. Desarrollo local (decidido)
+
+| Pieza | Cómo corre en local |
+|-------|---------------------|
+| Base de datos, auth, fotos, chat | Supabase CLI (`supabase start`), que levanta Postgres y los servicios en Docker |
+| API | `localhost` con Node |
+| Web | Next.js en `localhost` |
+| App iOS | **Expo Go** en tu iPhone (sin cuenta de Apple) o el simulador de iOS (requiere una Mac con Xcode) |
+| Pagos y envíos | `MockPaymentProvider` y `MockShippingProvider` |
+
+- **Requisitos en tu computadora:** Node.js LTS, pnpm, Docker Desktop y Git. En una Mac, Xcode es opcional y solo hace falta para el simulador.
+- **En las sesiones de Claude en la nube** se pueden correr el API, la web y los tests, pero no el simulador de iOS. La app móvil se prueba en tu equipo.
+- **Costo:** USD 0. Antes de lanzar se retoma la estimación de hosting: Supabase Pro ~USD 25/mes, Vercel Pro ~USD 20/mes, API ~USD 7–14/mes (o USD 0 si se aloja en Vercel), Apple USD 99/año.
