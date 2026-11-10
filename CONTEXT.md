@@ -100,8 +100,9 @@
 - Creó `docs/master-prompt.md` (spec del producto). Se completaron T-001 (objetivo) y T-005 (texto final del prompt).
 - Definió las etapas y la tabla de valores configurables por mercado.
 - Completó T-006: el usuario aprobó el stack de `docs/arquitectura.md` y la estructura `apps/` + `packages/`.
+- Creó la skill `/what-now` (`SKILLS.md` y `.claude/skills/what-now/`), con los estados de las tasks en texto y sin íconos, y agregó estimados de tiempo a `docs/checklist.md`. Además, `/what-now` actualiza un dashboard (`docs/dashboard/`, generado por `scripts/what-now.mjs`) y `/what-now -dash` lo muestra. El dashboard incluye un kanban de tickets, que también muestra `/what-now -kanban`.
 - Creó `docs/prototipo/index.html`: prototipo navegable (HTML, sin backend) con las 5 pestañas, compra simulada, venta, ofertas y preferencias. Marca "gamma", acento lima y tarifas como placeholders.
-- **Commits:** `9b54f30` (skills, contexto y master prompt). La propuesta de T-006 aún no tiene commit.
+- **Commits:** `9b54f30`, `1a29069`, `cea9204`, `e677adf`, `1867345`. La skill `/what-now` aún no tiene commit.
 
 ## 🗂️ Resumen histórico (sesiones anteriores, 1 línea c/u)
 
