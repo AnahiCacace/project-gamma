@@ -34,13 +34,18 @@
 
 > Solo una a la vez. Mientras exista, los agentes no avanzan en otras tasks (ver la "Regla de bloqueo" en `SKILLS.md`).
 
-- **Ninguna.** Siguiente candidata: T-006. El usuario debe confirmarla antes de marcarla como bloqueante.
+- **ID:** T-006
+- **Título:** Proponer stack y arquitectura (iOS + web, backend, adaptadores de pago y envío)
+- **Estado:** 🔒 En curso: propuesta escrita, esperando la revisión del usuario
+- **Asignado a:** Claude Code (propuesta) + usuario (aprobación)
+- **Criterio de cierre:** El usuario aprueba (o ajusta) `docs/arquitectura.md` y la decisión queda en "🧭 Decisiones clave".
+- **Siguiente paso concreto:** El usuario responde las preguntas de la sección 8 de `docs/arquitectura.md`.
+- **Bloqueos / dependencias:** Aprobación del usuario.
 
 ## 📋 Backlog (tasks futuras)
 
 | ID    | Task | Prioridad | Asignado a | Notas |
 |-------|------|-----------|------------|-------|
-| T-006 | Proponer stack y arquitectura (iOS + web, backend, adaptadores de pago y envío) y esperar aprobación | Alta | — | Fase 0. Explicar la opción recomendada y sus consecuencias |
 | T-002 | Completar las convenciones de la sección 6 de `CLAUDE.md` (idioma, ramas, commits) | Alta | — | El idioma de facto es el español |
 | T-008 | Definir el modelo de dominio y los estados de pedido, pago y envío | Alta | — | Fase 0. Depende de T-006 |
 | T-007 | Guardar la grabación de referencia en el repo o un resumen de sus pantallas | Media | — | Hoy es solo un adjunto de la sesión |
@@ -91,7 +96,8 @@
 - Creó `SKILLS.md`, `CONTEXT.md` y `.claude/skills/innit-repo/SKILL.md`.
 - Creó `docs/master-prompt.md` (spec del producto). Se completaron T-001 (objetivo) y T-005 (texto final del prompt).
 - Definió las etapas y la tabla de valores configurables por mercado.
-- **Commits:** ninguno todavía (pendiente de aprobación del usuario).
+- Inició T-006: escribió la propuesta en `docs/arquitectura.md` (recomienda Expo + Next.js + API TS + Supabase).
+- **Commits:** `9b54f30` (skills, contexto y master prompt). La propuesta de T-006 aún no tiene commit.
 
 ## 🗂️ Resumen histórico (sesiones anteriores, 1 línea c/u)
 
