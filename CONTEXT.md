@@ -23,7 +23,7 @@
 
 | Fase | Alcance | Estado |
 |------|---------|--------|
-| 0 | Stack, arquitectura, modelo de dominio y reglas configurables por mercado | Pendiente |
+| 0 | Stack, arquitectura, modelo de dominio y reglas configurables por mercado | En curso: stack aprobado; falta el dominio (T-008) |
 | 1 | **Flujo de punta a punta mínimo:** registro → publicar anuncio → descubrir/buscar → producto → bolsa → checkout (pago simulado) → pedido → envío (simulado) → saldo del vendedor | Pendiente |
 | 2 | Resto del MVP: perfil/tienda, favoritos y guardados, preferencias de marcas y tallas, mensajes y ofertas, filtros de inbox y pedidos, reseñas, reportes, bloqueo, moderación y soporte | Pendiente |
 | 3 | Integración de proveedores reales de pago y envío (tras elegirlos), y endurecimiento para producción | Pendiente |
@@ -34,13 +34,7 @@
 
 > Solo una a la vez. Mientras exista, los agentes no avanzan en otras tasks (ver la "Regla de bloqueo" en `SKILLS.md`).
 
-- **ID:** T-006
-- **Título:** Proponer stack y arquitectura (iOS + web, backend, adaptadores de pago y envío)
-- **Estado:** 🔒 En curso: propuesta escrita, esperando la revisión del usuario
-- **Asignado a:** Claude Code (propuesta) + usuario (aprobación)
-- **Criterio de cierre:** El usuario aprueba (o ajusta) `docs/arquitectura.md` y la decisión queda en "🧭 Decisiones clave".
-- **Siguiente paso concreto:** El usuario responde las preguntas 1 (stack) y 2 (`src/` → `apps/` + `packages/`) de la sección 8 de `docs/arquitectura.md`. Las preguntas 3 y 4 ya están resueltas: desarrollo local.
-- **Bloqueos / dependencias:** Aprobación del usuario.
+- **Ninguna.** Siguiente candidata: T-008 (modelo de dominio y estados). El usuario debe confirmarla antes de marcarla como bloqueante.
 
 ## 📋 Backlog (tasks futuras)
 
@@ -51,7 +45,7 @@
 | T-009 | Revisar el hosting y los costos antes del lanzamiento | Baja | — | Ver la sección 9 de `docs/arquitectura.md` |
 | T-007 | Guardar la grabación de referencia en el repo o un resumen de sus pantallas | Media | — | Hoy es solo un adjunto de la sesión |
 | T-003 | Escribir el PRD inicial en `docs/` a partir de `docs/master-prompt.md` | Media | — | — |
-| T-004 | Actualizar la tabla de estructura de `CLAUDE.md` (`SKILLS.md`, `CONTEXT.md`, `.claude/skills/`) | Baja | — | — |
+| T-004 | Actualizar la tabla de estructura de `CLAUDE.md` y `README.md` (`apps/`, `packages/`, `SKILLS.md`, `CONTEXT.md`, `.claude/skills/`) | Media | — | `CLAUDE.md` no está en el repo; decidir si se versiona |
 
 ## ⚙️ Decisiones pendientes y valores configurables por mercado
 
@@ -84,6 +78,7 @@
 - 2026-11-10 — La memoria entre sesiones vive en `CONTEXT.md` y los procedimientos en `SKILLS.md`.
 - 2026-11-10 — Dirección visual original, en tema oscuro, sin usar la marca, los textos ni los recursos de Depop.
 - 2026-11-10 — Fase 1 = un flujo de punta a punta antes de ampliar las funcionalidades.
+- 2026-11-10 — **Stack aprobado (T-006):** monorepo TypeScript (pnpm + Turborepo) con `apps/mobile` (Expo), `apps/web` (Next.js) y `apps/api` (Hono), `packages/*` compartidos y Supabase (Postgres). `src/` se reemplaza por `apps/` + `packages/`. Detalle en `docs/arquitectura.md`.
 - 2026-11-10 — Desarrollo 100 % local (costo USD 0). El hosting se revisa antes del lanzamiento; estimación inicial: ~USD 55–75/mes + USD 99/año de Apple (ver `docs/arquitectura.md`, sección 9).
 
 ## ❓ Preguntas abiertas
@@ -98,7 +93,7 @@
 - Creó `SKILLS.md`, `CONTEXT.md` y `.claude/skills/innit-repo/SKILL.md`.
 - Creó `docs/master-prompt.md` (spec del producto). Se completaron T-001 (objetivo) y T-005 (texto final del prompt).
 - Definió las etapas y la tabla de valores configurables por mercado.
-- Inició T-006: escribió la propuesta en `docs/arquitectura.md` (recomienda Expo + Next.js + API TS + Supabase).
+- Completó T-006: el usuario aprobó el stack de `docs/arquitectura.md` y la estructura `apps/` + `packages/`.
 - **Commits:** `9b54f30` (skills, contexto y master prompt). La propuesta de T-006 aún no tiene commit.
 
 ## 🗂️ Resumen histórico (sesiones anteriores, 1 línea c/u)

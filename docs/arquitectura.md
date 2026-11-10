@@ -1,6 +1,6 @@
 # Propuesta de stack y arquitectura — T-006
 
-> **Estado:** PROPUESTA, sin aprobar. No se adopta nada ni se escribe código hasta que el usuario la apruebe (ver sección 8).
+> **Estado:** ✅ APROBADA por el usuario el 2026-11-10: opción A y estructura `apps/` + `packages/`, con desarrollo local (sección 9).
 > **Fuente de requisitos:** `docs/master-prompt.md` · **Contexto:** `CONTEXT.md`
 
 ## 1. Punto de partida
@@ -102,8 +102,8 @@ Cada paso se hace en commits chicos, con tu aprobación según `CLAUDE.md`.
 
 ## 8. Lo que necesito que decidas
 
-1. **¿Apruebas la opción A** (Expo + Next.js + API en TypeScript + Supabase)? ¿O prefieres B (solo Expo, más simple pero con menos SEO)?
-2. **¿Reemplazamos `src/` por `apps/` + `packages/`?**
+1. ~~**Stack**~~ → **Aprobada la opción A** (Expo + Next.js + API Hono en TypeScript + Supabase), con el API como app separada (`apps/api`).
+2. ~~**Estructura**~~ → **Aprobado `apps/` + `packages/`.** `src/` se elimina al crear el monorepo (fase 1, con confirmación).
 3. ~~**Hosting**~~ → **Decidido (2026-11-10): desarrollo 100 % local por ahora**, con costo USD 0. El hosting y sus costos se revisan antes del lanzamiento (ver la sección 9).
 4. ~~**Apple Developer**~~ → No hace falta mientras el desarrollo sea local (ver la sección 9).
 
