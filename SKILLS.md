@@ -105,7 +105,7 @@ Si `CONTEXT.md` tiene una task en la sección **"🔒 Task bloqueante"**:
 
 1. Agrega una entrada al **historial** con fecha, agente, qué se hizo (máx. 3 bullets), commits relevantes y archivos clave.
 2. Actualiza la **task bloqueante**: su estado, el siguiente paso concreto y los bloqueos. Si se cumplió el criterio de cierre, la mueve al historial como "Completada" y deja la sección en "Ninguna".
-3. Agrega al **backlog** las tasks nuevas que hayan surgido, con prioridad.
+3. Marca lo completado en **`docs/checklist.md`**, agrega allí las tasks nuevas en su nivel de prioridad (P0–P5) y sincroniza el resumen del backlog de `CONTEXT.md` (solo P0 y P1).
 4. Registra las **decisiones** importantes (qué se decidió y por qué, en 1 línea).
 5. Aplica las **reglas de compactación** (abajo).
 6. Muestra el diff de `CONTEXT.md` al usuario. Commitear el cambio requiere confirmación, según `CLAUDE.md`.

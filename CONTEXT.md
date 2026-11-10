@@ -38,14 +38,19 @@
 
 ## 📋 Backlog (tasks futuras)
 
-| ID    | Task | Prioridad | Asignado a | Notas |
-|-------|------|-----------|------------|-------|
-| T-002 | Completar las convenciones de la sección 6 de `CLAUDE.md` (idioma, ramas, commits) | Alta | — | El idioma de facto es el español |
-| T-008 | Definir el modelo de dominio y los estados de pedido, pago y envío | Alta | — | Fase 0. Depende de T-006 |
-| T-009 | Revisar el hosting y los costos antes del lanzamiento | Baja | — | Ver la sección 9 de `docs/arquitectura.md` |
-| T-007 | Guardar la grabación de referencia en el repo o un resumen de sus pantallas | Media | — | Hoy es solo un adjunto de la sesión |
-| T-003 | Escribir el PRD inicial en `docs/` a partir de `docs/master-prompt.md` | Media | — | — |
-| T-004 | Actualizar la tabla de estructura de `CLAUDE.md` y `README.md` (`apps/`, `packages/`, `SKILLS.md`, `CONTEXT.md`, `.claude/skills/`) | Media | — | `CLAUDE.md` no está en el repo; decidir si se versiona |
+> Resumen de `docs/checklist.md`, que es la fuente de verdad y está ordenado por prioridad. Aquí van solo P0 y P1; el resto aparece como conteo.
+
+| Prio | ID    | Task | Asignado a | Depende de |
+|------|-------|------|------------|------------|
+| P0 | T-010 | Feedback del prototipo `docs/prototipo/index.html` | usuario | — |
+| P0 | T-008 | Modelo de dominio y estados de pedido, pago y envío (`docs/dominio.md`) | Claude Code + usuario | — |
+| P0 | T-002 | Convenciones de `CLAUDE.md` (idioma, ramas, commits) | usuario + Claude Code | — |
+| P1 | T-004 | Versionar `CLAUDE.md` y actualizar la estructura en `CLAUDE.md` y `README.md` | Claude Code | T-002 |
+| P1 | T-012 | Instalar herramientas locales (Node, pnpm, Docker, Supabase CLI) | usuario | — |
+| P1 | T-013 | Nombre y marca del producto | usuario | T-010 |
+| P1 | T-003 | PRD inicial | Claude Code | T-010 |
+
+**Resto del checklist:** P2, fase 1 (T-014 a T-021, 8 tasks) · P3, fase 2 (T-022 a T-028, 7) · P4, negocio y legal (T-029 a T-035, 7) · P5, más adelante (6).
 
 ## ⚙️ Decisiones pendientes y valores configurables por mercado
 
@@ -69,7 +74,7 @@
 | `listings.min_price` / `max_photos` | Por definir | Pendiente |
 | `offers.expiry_hours` | Por definir | Pendiente |
 
-**Otras decisiones abiertas:** stack (T-006), nombre y marca propios, proveedor de autenticación, almacenamiento de imágenes, requisitos legales y de datos personales en PY.
+**Otras decisiones abiertas:** nombre y marca (T-013) y requisitos legales y de datos personales en PY (T-034). Ya resueltas por el stack (T-006): la autenticación y el almacenamiento de imágenes van con Supabase.
 
 **Regla fija:** nunca marcar un pedido como pagado sin una confirmación válida del proveedor. El adaptador simulado debe verse como "MODO PRUEBA" en la UI.
 
@@ -79,6 +84,7 @@
 - 2026-11-10 — Dirección visual original, en tema oscuro, sin usar la marca, los textos ni los recursos de Depop.
 - 2026-11-10 — Fase 1 = un flujo de punta a punta antes de ampliar las funcionalidades.
 - 2026-11-10 — **Stack aprobado (T-006):** monorepo TypeScript (pnpm + Turborepo) con `apps/mobile` (Expo), `apps/web` (Next.js) y `apps/api` (Hono), `packages/*` compartidos y Supabase (Postgres). `src/` se reemplaza por `apps/` + `packages/`. Detalle en `docs/arquitectura.md`.
+- 2026-11-10 — La navegación se tomó de la grabación (Inicio, Descubrir, Vender, Inbox, Perfil con Tienda/Vendidos/Compras/Me gusta y Mi cuenta). Textos en español de Paraguay con voseo ("Buscá", "para vos").
 - 2026-11-10 — Desarrollo 100 % local (costo USD 0). El hosting se revisa antes del lanzamiento; estimación inicial: ~USD 55–75/mes + USD 99/año de Apple (ver `docs/arquitectura.md`, sección 9).
 
 ## ❓ Preguntas abiertas
@@ -94,6 +100,7 @@
 - Creó `docs/master-prompt.md` (spec del producto). Se completaron T-001 (objetivo) y T-005 (texto final del prompt).
 - Definió las etapas y la tabla de valores configurables por mercado.
 - Completó T-006: el usuario aprobó el stack de `docs/arquitectura.md` y la estructura `apps/` + `packages/`.
+- Creó `docs/prototipo/index.html`: prototipo navegable (HTML, sin backend) con las 5 pestañas, compra simulada, venta, ofertas y preferencias. Marca "gamma", acento lima y tarifas como placeholders.
 - **Commits:** `9b54f30` (skills, contexto y master prompt). La propuesta de T-006 aún no tiene commit.
 
 ## 🗂️ Resumen histórico (sesiones anteriores, 1 línea c/u)

@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="es-PY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gamma — Prototipo</title>
+<style>
+  :root {
+    --bg: #0E0E10; --surface: #18181B; --surface2: #232327; --line: #2E2E33;
+    --text: #F4F4F5; --muted: #A1A1AA; --accent: #C8F560; --accent-ink: #0E0E10;
+    --lilac: #B9A6FF; --test: #FFB020; --danger: #FF6B6B; --ok: #4ADE80;
+    --radius: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #050506; color: var(--text); }
+  body { display: flex; justify-content: center; align-items: center; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input, select, textarea { font: inherit; color: var(--text); background: var(--surface2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; }
+  textarea { resize: vertical; min-height: 70px; }
+  .phone { position: relative; width: 100%; max-width: 420px; height: 100dvh; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
+  @media (min-width: 600px) { .phone { height: min(880px, 96dvh); border-radius: 36px; border: 1px solid #26262b; box-shadow: 0 30px 80px rgba(0,0,0,.6); } }
+  .testbar { background: var(--test); color: #1a1200; font-size: 11px; font-weight: 700; text-align: center; padding: 5px 8px; letter-spacing: .02em; }
+  .screen { flex: 1; overflow-y: auto; padding-bottom: 90px; }
+  .screen.no-nav { padding-bottom: 24px; }
+  .top { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+  .top h1 { font-size: 17px; font-weight: 700; flex: 1; text-align: center; }
+  .top .spacer { width: 36px; }
+  .search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--surface2); border-radius: 999px; padding: 9px 14px; color: var(--muted); font-size: 14px; }
+  .search input { background: none; border: 0; padding: 0; }
+  .search input:focus { outline: none; }
+  .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; position: relative; }
+  .icon-btn:hover { background: var(--surface2); }
+  .badge { position: absolute; top: 2px; right: 0; background: var(--accent); color: var(--accent-ink); font-size: 10px; font-weight: 800; border-radius: 999px; min-width: 16px; height: 16px; display: grid; place-items: center; padding: 0 4px; }
+  svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .wordmark { font-weight: 900; font-size: 22px; letter-spacing: -.04em; color: var(--accent); }
+  .section { padding: 6px 16px 14px; }
+  .section h2 { font-size: 18px; font-weight: 800; margin: 10px 0 10px; display: flex; justify-content: space-between; align-items: baseline; }
+  .section h2 small { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 10px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 13px; white-space: nowrap; }
+  .chip.on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 700; }
+  .chip.accent.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; }
+  .card { text-align: left; }
+  .thumb { position: relative; aspect-ratio: 4/5; border-radius: var(--radius); display: grid; place-items: center; font-size: 64px; overflow: hidden; }
+  .thumb .like { position: absolute; right: 8px; bottom: 8px; width: 32px; height: 32px; border-radius: 50%; background: rgba(14,14,16,.7); display: grid; place-items: center; }
+  .thumb .like svg { width: 18px; height: 18px; }
+  .liked svg { fill: var(--accent); stroke: var(--accent); }
+  .tag { position: absolute; left: 8px; top: 8px; background: rgba(14,14,16,.75); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 6px; }
+  .card .price { font-weight: 800; margin-top: 6px; font-size: 15px; }
+  .card .meta { color: var(--muted); font-size: 12px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero { margin: 4px 16px 14px; border-radius: 20px; padding: 20px; background: linear-gradient(135deg, #2b2350, #1b3b2a); position: relative; overflow: hidden; }
+  .hero b { font-size: 22px; display: block; line-height: 1.1; letter-spacing: -.02em; }
+  .hero p { color: #d4d4d8; font-size: 13px; margin: 6px 0 14px; max-width: 70%; }
+  .hero .emoji { position: absolute; right: 10px; bottom: -6px; font-size: 84px; }
+  .btn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; border-radius: 999px; padding: 12px 18px; font-weight: 800; font-size: 15px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.ghost { border: 1px solid var(--line); }
+  .btn.light { background: var(--text); color: var(--bg); }
+  .btn.block { width: 100%; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); width: 100%; text-align: left; }
+  .row .grow { flex: 1; min-width: 0; }
+  .row .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .chev { color: var(--muted); }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; flex: none; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(14,14,16,.94); backdrop-filter: blur(12px); border-top: 1px solid var(--line); display: flex; padding: 8px 6px calc(10px + env(safe-area-inset-bottom)); z-index: 10; }
+  .nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; color: var(--muted); padding: 4px 0; position: relative; }
+  .nav button.on { color: var(--text); font-weight: 700; }
+  .nav button.on::before { content: ""; position: absolute; top: -9px; width: 26px; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+  .nav .sell { width: 44px; height: 32px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 8px; position: sticky; top: 60px; background: var(--bg); z-index: 4; }
+  .tabs button { flex: 1; padding: 11px 0; font-size: 14px; color: var(--muted); border-bottom: 2px solid transparent; }
+  .tabs button.on { color: var(--text); font-weight: 700; border-color: var(--accent); }
+  .empty { text-align: center; color: var(--muted); padding: 50px 30px; font-size: 14px; }
+  .empty .big { font-size: 54px; margin-bottom: 10px; }
+  .empty b { display: block; color: var(--text); font-size: 16px; margin-bottom: 6px; }
+  .pd-img { aspect-ratio: 1/1; display: grid; place-items: center; font-size: 150px; position: relative; }
+  .pd-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+  .pd-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.4); }
+  .pd-dots i:first-child { background: #fff; }
+  .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .kv div { background: var(--surface); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+  .kv span { color: var(--muted); display: block; font-size: 11px; margin-bottom: 2px; }
+  .sticky-cta { position: sticky; bottom: 0; background: linear-gradient(transparent, var(--bg) 30%); padding: 18px 16px 16px; display: flex; gap: 10px; }
+  .field { margin-bottom: 12px; }
+  .field label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .photos button { aspect-ratio: 1; border: 1.5px dashed var(--line); border-radius: 12px; display: grid; place-items: center; color: var(--muted); font-size: 26px; }
+  .photos button.filled { border-style: solid; border-color: transparent; }
+  .sum { background: var(--surface); border-radius: var(--radius); padding: 14px; margin: 12px 0; font-size: 14px; }
+  .sum .l { display: flex; justify-content: space-between; padding: 5px 0; }
+  .sum .l.total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 10px; font-weight: 800; font-size: 16px; }
+  .note { font-size: 11.5px; color: var(--muted); }
+  .test-box { border: 1px dashed var(--test); background: rgba(255,176,32,.08); border-radius: var(--radius); padding: 14px; margin: 12px 0; font-size: 13px; }
+  .test-box b { color: var(--test); }
+  .opt { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 8px; width: 100%; text-align: left; }
+  .opt.on { border-color: var(--accent); background: rgba(200,245,96,.06); }
+  .opt .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+  .opt.on .dot { border: 5px solid var(--accent); }
+  .status { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: var(--surface2); }
+  .status.pend { background: rgba(255,176,32,.15); color: var(--test); }
+  .status.paid { background: rgba(74,222,128,.15); color: var(--ok); }
+  .status.ship { background: rgba(185,166,255,.15); color: var(--lilac); }
+  .timeline { margin: 12px 0; }
+  .timeline div { display: flex; gap: 12px; padding: 8px 0; font-size: 14px; color: var(--muted); }
+  .timeline div::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); margin-top: 3px; flex: none; }
+  .timeline div.done { color: var(--text); }
+  .timeline div.done::before { background: var(--accent); border-color: var(--accent); }
+  .bubble { max-width: 78%; padding: 10px 13px; border-radius: 16px; font-size: 14px; margin: 6px 0; }
+  .bubble.them { background: var(--surface2); border-bottom-left-radius: 4px; }
+  .bubble.me { background: var(--accent); color: var(--accent-ink); margin-left: auto; border-bottom-right-radius: 4px; }
+  .bubble.offer { background: var(--surface); border: 1px solid var(--lilac); }
+  .bubble.offer b { color: var(--lilac); }
+  .composer { position: sticky; bottom: 0; display: flex; gap: 8px; padding: 10px 16px 14px; background: var(--bg); border-top: 1px solid var(--line); }
+  .stats { display: flex; gap: 22px; align-items: center; padding: 6px 16px 10px; }
+  .stats div { text-align: center; font-size: 12px; color: var(--muted); }
+  .stats b { display: block; color: var(--text); font-size: 16px; }
+  .balance { margin: 4px 16px 12px; background: var(--surface); border-radius: var(--radius); padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .balance b { font-size: 20px; display: block; }
+  .toast { position: absolute; left: 16px; right: 16px; bottom: 100px; background: var(--text); color: var(--bg); padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 30; animation: fade .2s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } }
+  .sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 20; display: flex; align-items: flex-end; }
+  .sheet { background: var(--surface); width: 100%; border-radius: 22px 22px 0 0; padding: 18px 16px 24px; }
+  .sheet h3 { font-size: 17px; margin-bottom: 12px; }
+  .info { margin: 0 16px 12px; padding: 12px 14px; background: var(--surface); border-radius: 12px; font-size: 13px; color: var(--muted); }
+  .info b { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="phone" id="app"></div>
+
+<script>
+/* ============================================================
+   PROTOTIPO VISUAL — sin backend. Datos de ejemplo en memoria.
+   Marca "gamma" y valores de tarifas son PLACEHOLDERS.
+   ============================================================ */
+
+// ---- Reglas de mercado (valores de EJEMPLO, ver CONTEXT.md) ----
+const MARKET = {
+  code: 'PY', currency: '₲',
+  shippingOptions: [
+    { id: 'domicilio', label: 'Envío a domicilio', eta: '2–4 días hábiles', fee: 25000 },
+    { id: 'retiro', label: 'Retiro en punto de entrega', eta: '2–3 días hábiles', fee: 15000 },
+    { id: 'mano', label: 'Entrega en mano (Asunción)', eta: 'A coordinar', fee: 0 },
+  ],
+  buyerProtection: { pct: 0.05, fixed: 2000 },
+  sellerCommissionPct: 0.10,
+};
+
+const fmt = n => '₲ ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const I = {
+  home: '<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  mail: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.2-9A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5c-2.2 4.6-9.2 9-9.2 9z"/></svg>',
+  bag: '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg>',
+  close: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="m9 6 6 6-6 6"/></svg>',
+  more: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>',
+  menu: '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  filter: '<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  bookmark: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  bell: '<svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>',
+  star: '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--accent);stroke:var(--accent)"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
+};
+
+const BGS = ['#3b2a4f','#1f3d35','#4a2c22','#22344f','#4d4320','#3d2238','#263f2a','#402b2b'];
+let nextId = 100;
+const P = (title, brand, size, cond, color, price, cat, sub, emoji, seller, bg) =>
+  ({ id: nextId++, title, brand, size, cond, color, price, cat, sub, emoji, seller, bg: BGS[bg % BGS.length], desc: 'Prenda en buen estado, lavada y lista para usar. Consultá por medidas.' });
+
+const state = {
+  tab: 'home', stack: [], toast: null, sheet: null,
+  homeChip: 'Todo', discoverCat: null, query: '',
+  filters: { sub: 'Todo', size: 'Todas', cond: 'Todas', max: 0 },
+  inboxFilter: 'Todos', profileTab: 'Tienda', soldFilter: 'Por enviar',
+  likes: new Set([103, 107]), bag: [],
+  prefs: { brands: new Set(['Nike']), sizes: new Set(['M', '40']) },
+  checkout: { ship: 'domicilio' },
+  me: 'mi_tienda',
+  products: [
+    P('Campera de jean oversize', "Levi's", 'L', 'Muy bueno', 'Azul', 180000, 'Mujer', 'Abrigos', '🧥', 'sofi.vintage', 0),
+    P('Zapatillas Air retro', 'Nike', '40', 'Como nuevo', 'Blanco', 350000, 'Hombre', 'Calzados', '👟', 'mbarete.store', 1),
+    P('Vestido floral midi', 'Zara', 'S', 'Nuevo con etiqueta', 'Verde', 120000, 'Mujer', 'Vestidos', '👗', 'lucia_closet', 2),
+    P('Remera banda 90s', 'Vintage', 'M', 'Bueno', 'Negro', 65000, 'Hombre', 'Remeras', '👕', 'ropero.asu', 3),
+    P('Cartera de cuero', 'Sin marca', 'Única', 'Muy bueno', 'Marrón', 140000, 'Mujer', 'Accesorios', '👜', 'sofi.vintage', 4),
+    P('Jean recto tiro alto', "Levi's", 'M', 'Como nuevo', 'Celeste', 150000, 'Mujer', 'Pantalones', '👖', 'lucia_closet', 5),
+    P('Buzo canguro', 'Adidas', 'L', 'Muy bueno', 'Gris', 110000, 'Hombre', 'Abrigos', '🧶', 'mbarete.store', 6),
+    P('Botas de lluvia', 'Sin marca', '37', 'Bueno', 'Amarillo', 70000, 'Niños', 'Calzados', '🥾', 'ropero.asu', 7),
+    P('Gorra trucker', 'The North Face', 'Única', 'Como nuevo', 'Verde', 55000, 'Hombre', 'Accesorios', '🧢', 'mbarete.store', 0),
+    P('Pollera plisada', 'H&M', 'XS', 'Muy bueno', 'Bordó', 85000, 'Mujer', 'Pantalones', '🩱', 'lucia_closet', 1),
+    P('Lentes de sol', 'Ray-Ban', 'Única', 'Bueno', 'Negro', 210000, 'Otros', 'Accesorios', '🕶️', 'sofi.vintage', 2),
+    P('Camisa de lino', 'Uniqlo', 'M', 'Como nuevo', 'Blanco', 95000, 'Hombre', 'Remeras', '👔', 'ropero.asu', 3),
+  ],
+  orders: [],
+  sales: [{ id: 'V-0007', title: 'Remera Selección (2019)', emoji: '⚽', bg: BGS[6], price: 90000, buyer: 'jose.py', status: 'Por enviar' }],
+  balance: { pending: 81000, available: 120000 },
+  threads: [
+    { id: 't1', with: 'sofi.vintage', kind: 'Comprando', productId: 100, unread: true,
+      msgs: [{ from: 'me', text: '¡Hola! ¿Tenés medidas del largo?' }, { from: 'them', text: 'Hola 😊 Mide 62 cm de largo. Hago envíos a todo el país.' }] },
+    { id: 't2', with: 'jose.py', kind: 'Vendiendo', productId: null, title: 'Remera Selección (2019)', unread: false,
+      msgs: [{ from: 'them', text: '¿Me la dejás en 80 mil?' }, { from: 'them', offer: 80000 }] },
+  ],
+};
+
+const SUBS = ['Todo', 'Remeras', 'Pantalones', 'Vestidos', 'Calzados', 'Accesorios', 'Abrigos'];
+const CATS = ['Hombre', 'Mujer', 'Niños', 'Otros'];
+const BRANDS = ['Nike', 'Adidas', "Levi's", 'Zara', 'H&M', 'The North Face', 'Vintage', 'Uniqlo', 'Ray-Ban'];
+const SIZES = ['Todas', 'XS', 'S', 'M', 'L', 'XL', '37', '40', 'Única'];
+const CONDS = ['Todas', 'Nuevo con etiqueta', 'Como nuevo', 'Muy bueno', 'Bueno'];
+const ORDER_STEPS = ['Pendiente de pago', 'Pagado', 'Enviado', 'Entregado', 'Completado'];
+
+const byId = id => state.products.find(p => p.id === +id);
+const current = () => state.stack[state.stack.length - 1];
+const push = (view, params = {}) => { state.stack.push({ view, ...params }); render(true); };
+const pop = () => { state.stack.pop(); render(true); };
+const toast = msg => { state.toast = msg; render(); clearTimeout(toast.t); toast.t = setTimeout(() => { state.toast = null; render(); }, 2200); };
+
+// ------------------------- Componentes -------------------------
+const card = p => `
+  <button class="card" data-a="open" data-id="${p.id}">
+    <div class="thumb" style="background:${p.bg}">${p.emoji}
+      ${p.seller === state.me ? '<span class="tag">Tu anuncio</span>' : ''}
+      <span class="like ${state.likes.has(p.id) ? 'liked' : ''}" data-a="like" data-id="${p.id}">${I.heart}</span>
+    </div>
+    <div class="price">${fmt(p.price)}</div>
+    <div class="meta">${esc(p.brand)} · Talle ${esc(p.size)}</div>
+  </button>`;
+
+const header = () => `
+  <div class="top">
+    <div class="search" data-a="goSearch">${I.search}<span>Buscá ropa, marcas, talles…</span></div>
+    <button class="icon-btn" data-a="tab" data-tab="profile" data-ptab="Me gusta" aria-label="Me gusta">${I.heart}</button>
+    <button class="icon-btn" data-a="bag" aria-label="Bolsa">${I.bag}${state.bag.length ? `<span class="badge">${state.bag.length}</span>` : ''}</button>
+  </div>`;
+
+const backTop = (title, right = '<span class="spacer"></span>') => `
+  <div class="top"><button class="icon-btn" data-a="back" aria-label="Volver">${I.back}</button><h1>${title}</h1>${right}</div>`;
+
+const chips = (list, current, action, extra = '') =>
+  `<div class="chips">${list.map(c => `<button class="chip ${extra} ${c === current ? 'on' : ''}" data-a="${action}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+
+// ------------------------- Pantallas -------------------------
+function Home() {
+  const prefB = [...state.prefs.brands];
+  let list = state.products.filter(p => p.seller !== state.me || true);
+  if (state.homeChip !== 'Todo') list = list.filter(p => p.sub === state.homeChip);
+  const forYou = state.products.filter(p => prefB.includes(p.brand) || state.prefs.sizes.has(p.size));
+  return header() + `
+    <div class="hero">
+      <b>Tu ropero,<br>segunda vuelta.</b>
+      <p>Comprá y vendé moda usada en todo Paraguay.</p>
+      <button class="btn primary" data-a="tab" data-tab="sell">Vender una prenda</button>
+      <span class="emoji">🛍️</span>
+    </div>
+    ${forYou.length ? `<div class="section"><h2>Según tus preferencias <small>${esc(prefB.join(', ') || '')}</small></h2></div>
+    <div class="chips">${forYou.slice(0, 6).map(p => `<button style="width:120px;flex:none" class="card" data-a="open" data-id="${p.id}"><div class="thumb" style="background:${p.bg};font-size:44px">${p.emoji}</div><div class="price">${fmt(p.price)}</div></button>`).join('')}</div>` : ''}
+    <div class="section"><h2>Sugerido para vos</h2></div>
+    ${chips(SUBS, state.homeChip, 'homeChip')}
+    <div class="grid">${list.map(card).join('') || '<div class="empty">Nada en esta categoría todavía.</div>'}</div>`;
+}
+
+function Discover() {
+  const q = state.query.trim().toLowerCase();
+  const f = state.filters;
+  const searching = q || state.discoverCat || f.sub !== 'Todo' || f.size !== 'Todas' || f.cond !== 'Todas' || f.max;
+  let res = state.products.filter(p =>
+    (!q || (p.title + ' ' + p.brand + ' ' + p.color).toLowerCase().includes(q)) &&
+    (!state.discoverCat || p.cat === state.discoverCat) &&
+    (f.sub === 'Todo' || p.sub === f.sub) && (f.size === 'Todas' || p.size === f.size) &&
+    (f.cond === 'Todas' || p.cond === f.cond) && (!f.max || p.price <= f.max));
+  return `
+    <div class="top">
+      <div class="search">${I.search}<input id="q" placeholder="Buscá ropa, marcas, talles…" value="${esc(state.query)}" autocomplete="off"></div>
+      <button class="icon-btn" data-a="filters" aria-label="Filtros">${I.filter}</button>
+    </div>
+    ${searching ? `
+      <div class="chips">
+        ${state.discoverCat ? `<button class="chip on" data-a="clearCat">${state.discoverCat} ✕</button>` : ''}
+        ${f.sub !== 'Todo' ? `<span class="chip on">${f.sub}</span>` : ''}
+        ${f.size !== 'Todas' ? `<span class="chip on">Talle ${f.size}</span>` : ''}
+        ${f.cond !== 'Todas' ? `<span class="chip on">${f.cond}</span>` : ''}
+        ${f.max ? `<span class="chip on">Hasta ${fmt(f.max)}</span>` : ''}
+        <button class="chip" data-a="resetFilters">Limpiar</button>
+      </div>
+      <div class="section"><h2>${res.length} resultado${res.length === 1 ? '' : 's'}</h2></div>
+      <div class="grid">${res.map(card).join('')}</div>
+      ${res.length ? '' : '<div class="empty"><div class="big">🔍</div><b>Sin resultados</b>Probá con otra palabra o quitá filtros.</div>'}
+    ` : `
+      <div class="section"><h2>Comprá por categoría</h2></div>
+      ${CATS.map(c => `<button class="row" data-a="cat" data-v="${c}"><span class="grow">${c}</span><span class="chev">${I.chev}</span></button>`).join('')}
+      <div class="section"><h2>Marcas <small>Elegí tus favoritas en Perfil</small></h2></div>
+      <div class="chips" style="flex-wrap:wrap">${BRANDS.map(b => `<button class="chip ${state.prefs.brands.has(b) ? 'on accent' : ''}" data-a="brandSearch" data-v="${esc(b)}">${esc(b)}</button>`).join('')}</div>
+      <div class="section"><h2>Recién publicado</h2></div>
+      <div class="grid">${state.products.slice().reverse().slice(0, 4).map(card).join('')}</div>`}`;
+}
+
+function Sell() {
+  const d = state.draft || (state.draft = { photos: 0, title: '', desc: '', cat: 'Mujer', sub: 'Remeras', brand: '', size: 'M', cond: 'Muy bueno', color: '', price: '' });
+  const emojiFor = { Remeras: '👕', Pantalones: '👖', Vestidos: '👗', Calzados: '👟', Accesorios: '👜', Abrigos: '🧥' };
+  const net = +d.price ? +d.price * (1 - MARKET.sellerCommissionPct) : 0;
+  const opt = (arr, v) => arr.map(x => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  return `
+    <div class="top"><span class="spacer"></span><h1>Vender</h1><span class="spacer"></span></div>
+    <div class="section">
+      <div class="photos">${[0,1,2,3].map(i => `<button data-a="photo" class="${i < d.photos ? 'filled' : ''}" style="${i < d.photos ? `background:${BGS[i]}` : ''}">${i < d.photos ? (emojiFor[d.sub] || '📷') : '+'}</button>`).join('')}</div>
+      <p class="note" style="margin:-6px 0 14px">Tocá + para simular fotos (hasta 4 en el prototipo).</p>
+      <div class="field"><label>Título</label><input data-f="title" value="${esc(d.title)}" placeholder="Ej.: Campera de jean oversize"></div>
+      <div class="field"><label>Descripción</label><textarea data-f="desc" placeholder="Estado, medidas, detalles…">${esc(d.desc)}</textarea></div>
+      <div class="two">
+        <div class="field"><label>Categoría</label><select data-f="cat">${opt(CATS, d.cat)}</select></div>
+        <div class="field"><label>Tipo</label><select data-f="sub">${opt(SUBS.slice(1), d.sub)}</select></div>
+        <div class="field"><label>Marca</label><input data-f="brand" value="${esc(d.brand)}" placeholder="Ej.: Zara"></div>
+        <div class="field"><label>Talle</label><select data-f="size">${opt(SIZES.slice(1), d.size)}</select></div>
+        <div class="field"><label>Condición</label><select data-f="cond">${opt(CONDS.slice(1), d.cond)}</select></div>
+        <div class="field"><label>Color</label><input data-f="color" value="${esc(d.color)}" placeholder="Ej.: Negro"></div>
+      </div>
+      <div class="field"><label>Precio (₲)</label><input data-f="price" inputmode="numeric" value="${esc(d.price)}" placeholder="Ej.: 120000"></div>
+      <div class="sum" id="net">
+        <div class="l"><span>Comisión (${MARKET.sellerCommissionPct * 100}%, ejemplo)</span><span>${+d.price ? '− ' + fmt(+d.price * MARKET.sellerCommissionPct) : '—'}</span></div>
+        <div class="l total"><span>Recibís</span><span>${net ? fmt(net) : '—'}</span></div>
+      </div>
+      <button class="btn primary block" data-a="publish">Publicar anuncio</button>
+    </div>`;
+}
+
+function Inbox() {
+  const list = state.threads.filter(t => state.inboxFilter === 'Todos' || (state.inboxFilter === 'Mensajes' ? true : t.kind === state.inboxFilter));
+  return `
+    <div class="top"><span class="spacer"></span><h1>Inbox</h1><button class="icon-btn" aria-label="Notificaciones">${I.bell}</button></div>
+    ${chips(['Todos', 'Mensajes', 'Vendiendo', 'Comprando'], state.inboxFilter, 'inboxFilter')}
+    ${list.map(t => {
+      const p = t.productId ? byId(t.productId) : null; const last = t.msgs[t.msgs.length - 1];
+      return `<button class="row" data-a="thread" data-id="${t.id}">
+        <div class="avatar" style="background:${p ? p.bg : BGS[6]}">${p ? p.emoji : '⚽'}</div>
+        <div class="grow"><b>${esc(t.with)}</b> <span class="status ${t.kind === 'Vendiendo' ? 'ship' : ''}">${t.kind}</span>
+          <div class="sub">${last.offer ? 'Oferta: ' + fmt(last.offer) : esc(last.text)}</div></div>
+        ${t.unread ? '<span class="badge" style="position:static">1</span>' : ''}
+      </button>`; }).join('') || '<div class="empty"><div class="big">💬</div><b>Sin mensajes</b>Cuando escribas a alguien, aparece acá.</div>'}`;
+}
+
+function Profile() {
+  const mine = state.products.filter(p => p.seller === state.me);
+  const liked = state.products.filter(p => state.likes.has(p.id));
+  const t = state.profileTab;
+  let body = '';
+  if (t === 'Tienda') body = `
+    <div class="balance"><div><span class="note">Saldo disponible</span><b>${fmt(state.balance.available)}</b><span class="note">En camino: ${fmt(state.balance.pending)}</span></div>
+      <button class="btn ghost" data-a="payout">Retirar</button></div>
+    <div class="section"><h2>Activos (${mine.length})</h2></div>
+    ${mine.length ? `<div class="grid">${mine.map(card).join('')}</div>` : `<div class="empty"><div class="big">🪝</div><b>No tenés anuncios activos</b>Publicá una prenda para que la descubran.<br><br><button class="btn light" data-a="tab" data-tab="sell">Empezar a vender</button></div>`}`;
+  if (t === 'Vendidos') {
+    const s = state.sales.filter(x => x.status === state.soldFilter);
+    body = chips(['Por enviar', 'Enviados', 'Cancelados', 'Completados'], state.soldFilter, 'soldFilter') +
+      (s.map(x => `<div class="row"><div class="avatar" style="background:${x.bg}">${x.emoji}</div><div class="grow"><b>${esc(x.title)}</b><div class="sub">Comprador: ${esc(x.buyer)} · ${fmt(x.price)}</div></div>
+        ${x.status === 'Por enviar' ? `<button class="btn primary" style="padding:8px 12px;font-size:13px" data-a="ship" data-id="${x.id}">Marcar enviado</button>` : `<span class="status ship">${x.status}</span>`}</div>`).join('')
+       || '<div class="empty"><div class="big">📦</div>Nada en este estado.</div>');
+  }
+  if (t === 'Compras') body = state.orders.length ? state.orders.map(o => `
+    <button class="row" data-a="order" data-id="${o.id}"><div class="avatar" style="background:${o.items[0].bg}">${o.items[0].emoji}</div>
+      <div class="grow"><b>Pedido ${o.id}</b><div class="sub">${o.items.length} prenda(s) · ${fmt(o.total)}</div></div>
+      <span class="status ${o.status === 'Pendiente de pago' ? 'pend' : o.status === 'Pagado' ? 'paid' : 'ship'}">${o.status}</span></button>`).join('')
+    : '<div class="empty"><div class="big">🧾</div><b>Todavía no compraste nada</b>Tus pedidos y su seguimiento aparecen acá.</div>';
+  if (t === 'Me gusta') body = `
+    <button class="row" data-a="toast" data-v="Guardados: colecciones para organizar tus favoritos (próximamente en el MVP).">${I.bookmark}<span class="grow">Ver mis guardados</span><span class="chev">${I.chev}</span></button>
+    <div style="height:10px"></div>
+    ${liked.length ? `<div class="grid">${liked.map(card).join('')}</div>` : '<div class="empty"><div class="big">🤍</div>Tocá el corazón en una prenda para guardarla.</div>'}`;
+  return `
+    <div class="top"><span class="spacer"></span><h1>@${state.me}</h1><button class="icon-btn" data-a="account" aria-label="Mi cuenta">${I.menu}</button></div>
+    <div class="stats"><div class="avatar" style="background:var(--accent);color:var(--accent-ink);width:56px;height:56px">MT</div>
+      <div><b>12</b>seguidores</div><div><b>8</b>siguiendo</div><div><b style="display:flex;gap:3px;align-items:center;justify-content:center">4,9 ${I.star}</b>3 reseñas</div></div>
+    <div class="tabs">${['Tienda', 'Vendidos', 'Compras', 'Me gusta'].map(x => `<button class="${x === t ? 'on' : ''}" data-a="ptab" data-v="${x}">${x}</button>`).join('')}</div>
+    ${body}`;
+}
+
+function Product({ id }) {
+  const p = byId(id); const mine = p.seller === state.me; const inBag = state.bag.includes(p.id);
+  return backTop('', `<button class="icon-btn" data-a="more" data-id="${p.id}" aria-label="Más">${I.more}</button>`) + `
+    <div class="pd-img" style="background:${p.bg}">${p.emoji}<div class="pd-dots"><i></i><i></i><i></i></div></div>
+    <div class="section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div><div style="font-size:24px;font-weight:900">${fmt(p.price)}</div><div class="note">+ envío y protección al comprador</div></div>
+        <button class="icon-btn ${state.likes.has(p.id) ? 'liked' : ''}" data-a="like" data-id="${p.id}">${I.heart}</button>
+      </div>
+      <h2 style="font-size:18px;margin:12px 0 4px">${esc(p.title)}</h2>
+      <p style="color:var(--muted);font-size:14px">${esc(p.desc)}</p>
+      <div class="kv"><div><span>Marca</span>${esc(p.brand)}</div><div><span>Talle</span>${esc(p.size)}</div>
+        <div><span>Condición</span>${esc(p.cond)}</div><div><span>Color</span>${esc(p.color)}</div>
+        <div><span>Categoría</span>${esc(p.cat)} · ${esc(p.sub)}</div><div><span>Envío</span>Desde ${fmt(15000)}</div></div>
+      <button class="row" style="padding:12px 0" data-a="toast" data-v="Tienda de @${esc(p.seller)} (pantalla en el MVP).">
+        <div class="avatar" style="background:var(--surface2)">${esc(p.seller[0].toUpperCase())}</div>
+        <div class="grow"><b>@${esc(p.seller)}</b><div class="sub" style="display:flex;gap:4px;align-items:center">${I.star} 4,8 · 27 reseñas · Responde en ~1 h</div></div><span class="chev">${I.chev}</span></button>
+    </div>
+    ${mine ? `<div class="sticky-cta"><button class="btn ghost block" data-a="toast" data-v="Editar anuncio (en el MVP).">Editar anuncio</button></div>` : `
+    <div class="sticky-cta">
+      <button class="btn ghost" data-a="offer" data-id="${p.id}">Ofertar</button>
+      <button class="btn ghost" data-a="message" data-id="${p.id}">${I.mail}</button>
+      <button class="btn primary" style="flex:1" data-a="addBag" data-id="${p.id}">${inBag ? 'En tu bolsa ✓' : 'Agregar a la bolsa'}</button>
+    </div>`}`;
+}
+
+function Bag() {
+  const items = state.bag.map(byId); const sub = items.reduce((a, p) => a + p.price, 0);
+  return backTop('Tu bolsa') + (items.length ? `
+    ${items.map(p => `<div class="row"><div class="avatar" style="background:${p.bg};border-radius:12px;width:56px;height:56px;font-size:28px">${p.emoji}</div>
+      <div class="grow"><b>${esc(p.title)}</b><div class="sub">@${esc(p.seller)} · Talle ${esc(p.size)}</div><div style="font-weight:800;margin-top:4px">${fmt(p.price)}</div></div>
+      <button class="icon-btn" data-a="rmBag" data-id="${p.id}" aria-label="Quitar">${I.close}</button></div>`).join('')}
+    <div class="section"><div class="sum"><div class="l total" style="border:0;margin:0;padding:0"><span>Subtotal</span><span>${fmt(sub)}</span></div></div>
+      <button class="btn primary block" data-a="checkout">Ir a pagar</button></div>`
+    : '<div class="empty"><div class="big">🛍️</div><b>Tu bolsa está vacía</b>Agregá prendas desde su página.</div>');
+}
+
+function totals() {
+  const items = state.bag.map(byId); const sub = items.reduce((a, p) => a + p.price, 0);
+  const ship = MARKET.shippingOptions.find(o => o.id === state.checkout.ship).fee;
+  const prot = Math.round(sub * MARKET.buyerProtection.pct + MARKET.buyerProtection.fixed);
+  return { items, sub, ship, prot, total: sub + ship + prot };
+}
+
+function Checkout() {
+  const t = totals();
+  return backTop('Checkout') + `<div class="section">
+    <h2>Entrega</h2>
+    ${MARKET.shippingOptions.map(o => `<button class="opt ${state.checkout.ship === o.id ? 'on' : ''}" data-a="ship-opt" data-v="${o.id}"><span class="dot"></span>
+      <span class="grow" style="flex:1"><b>${o.label}</b><div class="note">${o.eta}</div></span><b>${o.fee ? fmt(o.fee) : 'Gratis'}</b></button>`).join('')}
+    <div class="field" style="margin-top:8px"><label>Dirección</label><input value="Av. Mcal. López 1234, Asunción" aria-label="Dirección"></div>
+    <div class="sum">
+      <div class="l"><span>Prendas (${t.items.length})</span><span>${fmt(t.sub)}</span></div>
+      <div class="l"><span>Envío</span><span>${t.ship ? fmt(t.ship) : 'Gratis'}</span></div>
+      <div class="l"><span>Protección al comprador</span><span>${fmt(t.prot)}</span></div>
+      <div class="l total"><span>Total</span><span>${fmt(t.total)}</span></div>
+      <p class="note" style="margin-top:6px">Tarifas de ejemplo: se configuran por mercado y todavía no están definidas.</p>
+    </div>
+    <div class="test-box"><b>MODO PRUEBA:</b> no hay un proveedor de pago conectado. Al continuar se crea el pedido como <b>Pendiente de pago</b> y se abre un simulador.</div>
+    <button class="btn primary block" data-a="pay">Pagar ${fmt(t.total)}</button></div>`;
+}
+
+function PaySim({ orderId }) {
+  const o = state.orders.find(x => x.id === orderId);
+  return `<div class="top"><span class="spacer"></span><h1>Simulador de pago</h1><span class="spacer"></span></div>
+    <div class="section">
+      <div class="test-box"><b>MODO PRUEBA — ningún pago es real.</b><br>Esto representa la pantalla del proveedor (por ej. Bancard o Pagopar). El pedido solo pasa a <b>Pagado</b> cuando el proveedor envía una confirmación válida.</div>
+      <div class="sum"><div class="l"><span>Pedido</span><b>${o.id}</b></div><div class="l"><span>Estado actual</span><span class="status pend">${o.status}</span></div><div class="l total"><span>Monto</span><span>${fmt(o.total)}</span></div></div>
+      <button class="btn primary block" data-a="simPay" data-v="ok" data-id="${o.id}">Simular pago aprobado</button>
+      <div style="height:10px"></div>
+      <button class="btn ghost block" data-a="simPay" data-v="fail" data-id="${o.id}">Simular pago rechazado</button>
+    </div>`;
+}
+
+function Order({ id }) {
+  const o = state.orders.find(x => x.id === id); const idx = ORDER_STEPS.indexOf(o.status);
+  return backTop('Pedido ' + o.id) + `<div class="section">
+    ${o.items.map(p => `<div class="row" style="padding-left:0;padding-right:0"><div class="avatar" style="background:${p.bg};border-radius:12px">${p.emoji}</div><div class="grow"><b>${esc(p.title)}</b><div class="sub">@${esc(p.seller)}</div></div><b>${fmt(p.price)}</b></div>`).join('')}
+    <h2>Seguimiento</h2>
+    <div class="timeline">${ORDER_STEPS.map((s, i) => `<div class="${i <= idx ? 'done' : ''}">${s}${i === 2 && idx >= 2 ? ' · Código SIM-48213' : ''}</div>`).join('')}</div>
+    ${o.status === 'Pendiente de pago' ? `<button class="btn primary block" data-a="resume" data-id="${o.id}">Continuar pago (prueba)</button>` : ''}
+    ${o.status === 'Entregado' ? `<button class="btn primary block" data-a="review" data-id="${o.id}">Confirmar recepción y dejar reseña</button>` : ''}
+    ${['Pagado', 'Enviado'].includes(o.status) ? `<button class="btn ghost block" data-a="advance" data-id="${o.id}">Simular siguiente estado de envío</button>` : ''}
+    <div style="height:10px"></div>
+    <button class="btn ghost block" data-a="toast" data-v="Soporte: se abriría un caso vinculado a este pedido.">Tengo un problema con este pedido</button>
+  </div>`;
+}
+
+function Thread({ id }) {
+  const t = state.threads.find(x => x.id === id); t.unread = false;
+  const p = t.productId ? byId(t.productId) : null;
+  return backTop('@' + t.with) + `
+    ${p ? `<button class="row" data-a="open" data-id="${p.id}"><div class="avatar" style="background:${p.bg};border-radius:10px">${p.emoji}</div><div class="grow"><b>${esc(p.title)}</b><div class="sub">${fmt(p.price)}</div></div><span class="chev">${I.chev}</span></button>` : `<div class="row"><div class="avatar" style="background:${BGS[6]};border-radius:10px">⚽</div><div class="grow"><b>${esc(t.title)}</b><div class="sub">Tu anuncio</div></div></div>`}
+    <div class="section" style="min-height:300px">
+      ${t.msgs.map(m => m.offer ? `<div class="bubble offer ${m.from === 'me' ? 'me' : 'them'}" style="${m.from === 'me' ? 'margin-left:auto' : ''}">
+          <b>Oferta: ${fmt(m.offer)}</b>${m.from !== 'me' && !m.done ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="btn primary" style="padding:6px 12px;font-size:13px" data-a="acceptOffer" data-id="${t.id}">Aceptar</button><button class="btn ghost" style="padding:6px 12px;font-size:13px" data-a="declineOffer" data-id="${t.id}">Rechazar</button></div>` : m.done ? `<div class="note">${m.done}</div>` : '<div class="note" style="color:inherit">Esperando respuesta</div>'}</div>`
+        : `<div class="bubble ${m.from === 'me' ? 'me' : 'them'}">${esc(m.text)}</div>`).join('')}
+    </div>
+    <div class="composer"><input id="msg" placeholder="Escribí un mensaje…" autocomplete="off"><button class="btn primary" data-a="send" data-id="${t.id}">Enviar</button></div>`;
+}
+
+function Account() {
+  return backTop('Mi cuenta') + `
+    <button class="row" data-a="tab" data-tab="sell"><span class="grow"><b>Empezar a vender</b></span><span class="chev">${I.chev}</span></button>
+    <div class="section"><h2>Ayuda</h2></div>
+    <button class="row" data-a="toast" data-v="Centro de ayuda (en el MVP)."><span class="grow">Ayuda y soporte</span><span class="chev">${I.chev}</span></button>
+    <div class="section"><h2>Configuración</h2></div>
+    <button class="row" data-a="toast" data-v="Datos de la cuenta (en el MVP)."><span class="grow">Datos de la cuenta</span><span class="chev">${I.chev}</span></button>
+    <button class="row" data-a="prefs"><span class="grow">Preferencias de marcas y talles</span><span class="chev">${I.chev}</span></button>
+    <button class="row" data-a="toast" data-v="Cuentas bloqueadas: 0"><span class="grow">Cuentas bloqueadas</span><span class="chev">${I.chev}</span></button>
+    <button class="row" data-a="toast" data-v="Privacidad (en el MVP)."><span class="grow">Privacidad</span><span class="chev">${I.chev}</span></button>
+    <div class="section"><p class="note" style="margin-top:14px">Prototipo visual · Mercado ${MARKET.code} · ${MARKET.currency}</p></div>`;
+}
+
+function Prefs() {
+  const sizeGroups = { 'Ropa': ['XS', 'S', 'M', 'L', 'XL'], 'Calzado': ['36', '37', '38', '39', '40', '41', '42'] };
+  return backTop('Preferencias') + `
+    <div class="info">Usamos tus <b>marcas y talles</b> para personalizar el Inicio.</div>
+    <div class="section"><h2>Marcas</h2></div>
+    <div class="chips" style="flex-wrap:wrap">${BRANDS.map(b => `<button class="chip accent ${state.prefs.brands.has(b) ? 'on' : ''}" data-a="prefBrand" data-v="${esc(b)}">${esc(b)}</button>`).join('')}</div>
+    ${Object.entries(sizeGroups).map(([g, arr]) => `<div class="section"><h2>Talles · ${g}</h2></div>
+      <div class="chips" style="flex-wrap:wrap">${arr.map(s => `<button class="chip accent ${state.prefs.sizes.has(s) ? 'on' : ''}" data-a="prefSize" data-v="${s}">${s}</button>`).join('')}</div>`).join('')}`;
+}
+
+const VIEWS = { product: Product, bag: Bag, checkout: Checkout, paysim: PaySim, order: Order, thread: Thread, account: Account, prefs: Prefs };
+const TABS = { home: Home, discover: Discover, sell: Sell, inbox: Inbox, profile: Profile };
+
+function sheetHTML() {
+  const s = state.sheet; if (!s) return '';
+  if (s.type === 'filters') {
+    const f = state.filters;
+    const sel = (k, arr) => `<select data-filter="${k}">${arr.map(x => `<option ${f[k] === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>`;
+    return `<div class="sheet-bg" data-a="closeSheet"><div class="sheet" data-stop>
+      <h3>Filtros</h3>
+      <div class="two"><div class="field"><label>Tipo</label>${sel('sub', SUBS)}</div><div class="field"><label>Talle</label>${sel('size', SIZES)}</div></div>
+      <div class="field"><label>Condición</label>${sel('cond', CONDS)}</div>
+      <div class="field"><label>Precio máximo (₲)</label><input data-filter="max" inputmode="numeric" value="${f.max || ''}" placeholder="Sin límite"></div>
+      <button class="btn primary block" data-a="applyFilters">Ver resultados</button></div></div>`;
+  }
+  if (s.type === 'more') return `<div class="sheet-bg" data-a="closeSheet"><div class="sheet" data-stop>
+      <h3>Opciones</h3>
+      <button class="row" data-a="report"><span class="grow">Reportar anuncio</span></button>
+      <button class="row" data-a="block" data-id="${s.id}"><span class="grow" style="color:var(--danger)">Bloquear vendedor</span></button>
+      <button class="row" data-a="closeSheet"><span class="grow">Cancelar</span></button></div></div>`;
+  if (s.type === 'offer') { const p = byId(s.id); return `<div class="sheet-bg" data-a="closeSheet"><div class="sheet" data-stop>
+      <h3>Hacer una oferta</h3><p class="note" style="margin-bottom:10px">Precio publicado: ${fmt(p.price)}</p>
+      <div class="field"><label>Tu oferta (₲)</label><input id="offerAmt" inputmode="numeric" value="${Math.round(p.price * 0.85 / 1000) * 1000}"></div>
+      <button class="btn primary block" data-a="sendOffer" data-id="${p.id}">Enviar oferta</button></div></div>`; }
+  if (s.type === 'review') return `<div class="sheet-bg" data-a="closeSheet"><div class="sheet" data-stop>
+      <h3>¿Cómo fue tu compra?</h3>
+      <div class="chips" style="padding:0 0 12px">${[1,2,3,4,5].map(n => `<button class="chip ${n === 5 ? 'on' : ''}">${'★'.repeat(n)}</button>`).join('')}</div>
+      <textarea placeholder="Contá tu experiencia (opcional)"></textarea><div style="height:12px"></div>
+      <button class="btn primary block" data-a="sendReview" data-id="${s.id}">Publicar reseña</button></div></div>`;
+  return '';
+}
+
+// ------------------------- Render -------------------------
+function render(scrollTop) {
+  const app = document.getElementById('app');
+  const prevScroll = app.querySelector('.screen')?.scrollTop || 0;
+  const v = current();
+  const body = v ? VIEWS[v.view](v) : TABS[state.tab]();
+  const showNav = !v;
+  app.innerHTML = `
+    <div class="testbar">PROTOTIPO · MODO PRUEBA · pagos y datos simulados</div>
+    <div class="screen ${showNav ? '' : 'no-nav'}">${body}</div>
+    ${showNav ? `<nav class="nav">
+      ${[['home', 'Inicio', I.home], ['discover', 'Descubrir', I.search], ['sell', 'Vender', `<span class="sell">${I.plus}</span>`], ['inbox', 'Inbox', I.mail], ['profile', 'Perfil', I.user]]
+        .map(([k, l, ic]) => `<button class="${state.tab === k ? 'on' : ''}" data-a="tab" data-tab="${k}">${ic}<span>${l}</span>${k === 'inbox' && state.threads.some(t => t.unread) ? '<span class="badge" style="right:22%">•</span>' : ''}</button>`).join('')}
+    </nav>` : ''}
+    ${sheetHTML()}
+    ${state.toast ? `<div class="toast">${esc(state.toast)}</div>` : ''}`;
+  const sc = app.querySelector('.screen');
+  sc.scrollTop = scrollTop ? 0 : prevScroll;
+}
+
+// ------------------------- Acciones -------------------------
+const A = {
+  tab: d => { state.stack = []; state.tab = d.tab; if (d.ptab) state.profileTab = d.ptab; render(true); },
+  back: pop,
+  open: d => push('product', { id: +d.id }),
+  like: d => { const id = +d.id; state.likes.has(id) ? state.likes.delete(id) : state.likes.add(id); toast(state.likes.has(id) ? 'Guardado en Me gusta' : 'Quitado de Me gusta'); },
+  homeChip: d => { state.homeChip = d.v; render(); },
+  goSearch: () => A.tab({ tab: 'discover' }),
+  cat: d => { state.discoverCat = d.v; render(true); },
+  clearCat: () => { state.discoverCat = null; render(); },
+  brandSearch: d => { state.query = d.v; render(true); },
+  filters: () => { state.sheet = { type: 'filters' }; render(); },
+  applyFilters: () => {
+    document.querySelectorAll('[data-filter]').forEach(el => { const k = el.dataset.filter; state.filters[k] = k === 'max' ? (+el.value.replace(/\D/g, '') || 0) : el.value; });
+    state.sheet = null; render(true);
+  },
+  resetFilters: () => { state.filters = { sub: 'Todo', size: 'Todas', cond: 'Todas', max: 0 }; state.discoverCat = null; state.query = ''; render(true); },
+  closeSheet: () => { state.sheet = null; render(); },
+  photo: () => { if (state.draft.photos < 4) state.draft.photos++; render(); },
+  publish: () => {
+    const d = state.draft; const price = +String(d.price).replace(/\D/g, '');
+    if (!d.photos || !d.title.trim() || !price) return toast('Agregá al menos 1 foto, un título y un precio.');
+    const emojiFor = { Remeras: '👕', Pantalones: '👖', Vestidos: '👗', Calzados: '👟', Accesorios: '👜', Abrigos: '🧥' };
+    const p = P(d.title.trim(), d.brand.trim() || 'Sin marca', d.size, d.cond, d.color.trim() || '—', price, d.cat, d.sub, emojiFor[d.sub] || '👕', state.me, nextId);
+    if (d.desc.trim()) p.desc = d.desc.trim();
+    state.products.push(p); state.draft = null; state.profileTab = 'Tienda';
+    A.tab({ tab: 'profile' }); toast('¡Publicado! Ya aparece en Inicio y Descubrir.');
+  },
+  inboxFilter: d => { state.inboxFilter = d.v; render(); },
+  thread: d => push('thread', { id: d.id }),
+  send: d => { const el = document.getElementById('msg'); if (!el.value.trim()) return; state.threads.find(t => t.id === d.id).msgs.push({ from: 'me', text: el.value.trim() }); render(); },
+  acceptOffer: d => { const t = state.threads.find(x => x.id === d.id); const m = t.msgs.find(x => x.offer && !x.done); m.done = 'Aceptada · el comprador puede pagar a este precio'; t.msgs.push({ from: 'me', text: '¡Dale! Te la dejo en ' + fmt(m.offer) + '.' }); render(); },
+  declineOffer: d => { const t = state.threads.find(x => x.id === d.id); const m = t.msgs.find(x => x.offer && !x.done); m.done = 'Rechazada'; render(); },
+  message: d => {
+    const p = byId(d.id); let t = state.threads.find(x => x.productId === p.id);
+    if (!t) { t = { id: 't' + Date.now(), with: p.seller, kind: 'Comprando', productId: p.id, msgs: [{ from: 'me', text: '¡Hola! ¿Sigue disponible?' }] }; state.threads.unshift(t); }
+    push('thread', { id: t.id });
+  },
+  offer: d => { state.sheet = { type: 'offer', id: +d.id }; render(); },
+  sendOffer: d => {
+    const amt = +document.getElementById('offerAmt').value.replace(/\D/g, ''); const p = byId(d.id); state.sheet = null;
+    let t = state.threads.find(x => x.productId === p.id);
+    if (!t) { t = { id: 't' + Date.now(), with: p.seller, kind: 'Comprando', productId: p.id, msgs: [] }; state.threads.unshift(t); }
+    t.msgs.push({ from: 'me', offer: amt }); push('thread', { id: t.id }); toast('Oferta enviada a @' + p.seller);
+  },
+  more: d => { state.sheet = { type: 'more', id: +d.id }; render(); },
+  report: () => { state.sheet = null; toast('Gracias. Nuestro equipo de moderación va a revisar el anuncio.'); },
+  block: d => { const s = byId(d.id).seller; state.sheet = null; state.products = state.products.filter(p => p.seller !== s); state.stack = []; render(true); toast('Bloqueaste a @' + s + '. No vas a ver sus anuncios.'); },
+  addBag: d => { const id = +d.id; if (!state.bag.includes(id)) state.bag.push(id); render(); toast('Agregado a tu bolsa'); },
+  bag: () => push('bag'),
+  rmBag: d => { state.bag = state.bag.filter(x => x !== +d.id); render(); },
+  checkout: () => push('checkout'),
+  'ship-opt': d => { state.checkout.ship = d.v; render(); },
+  pay: () => {
+    const t = totals(); const id = 'P-' + String(1000 + state.orders.length + 1);
+    state.orders.unshift({ id, items: t.items, total: t.total, status: 'Pendiente de pago' });
+    state.stack = [{ view: 'paysim', orderId: id }]; render(true);
+  },
+  simPay: d => {
+    const o = state.orders.find(x => x.id === d.id);
+    if (d.v === 'ok') {
+      o.status = 'Pagado'; state.products = state.products.filter(p => !o.items.some(i => i.id === p.id)); state.bag = [];
+      state.stack = [{ view: 'order', id: o.id }]; render(true); toast('Confirmación recibida del proveedor (simulada). Pedido pagado.');
+    } else { state.stack = [{ view: 'order', id: o.id }]; render(true); toast('Pago rechazado (simulado). El pedido sigue pendiente.'); }
+  },
+  resume: d => { state.stack.push({ view: 'paysim', orderId: d.id }); render(true); },
+  order: d => push('order', { id: d.id }),
+  advance: d => { const o = state.orders.find(x => x.id === d.id); o.status = ORDER_STEPS[ORDER_STEPS.indexOf(o.status) + 1]; render(); },
+  review: d => { state.sheet = { type: 'review', id: d.id }; render(); },
+  sendReview: d => { const o = state.orders.find(x => x.id === d.id); o.status = 'Completado'; state.sheet = null; render(); toast('¡Gracias por tu reseña! Se libera el pago al vendedor.'); },
+  ptab: d => { state.profileTab = d.v; render(); },
+  soldFilter: d => { state.soldFilter = d.v; render(); },
+  ship: d => { const s = state.sales.find(x => x.id === d.id); s.status = 'Enviados'; render(); toast('Marcado como enviado. El comprador recibe el código de seguimiento.'); },
+  payout: () => toast('Retiro a cuenta bancaria: se habilita al conectar un proveedor de pagos.'),
+  account: () => push('account'),
+  prefs: () => push('prefs'),
+  prefBrand: d => { const s = state.prefs.brands; s.has(d.v) ? s.delete(d.v) : s.add(d.v); render(); },
+  prefSize: d => { const s = state.prefs.sizes; s.has(d.v) ? s.delete(d.v) : s.add(d.v); render(); },
+  toast: d => toast(d.v),
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a], [data-stop]');
+  if (!el) return;
+  if (el.hasAttribute('data-stop') && !e.target.closest('[data-a]')) return;
+  const target = e.target.closest('[data-a]');
+  if (target.dataset.a === 'closeSheet' && target.classList.contains('sheet-bg') && e.target.closest('[data-stop]')) return;
+  e.stopPropagation();
+  A[target.dataset.a]?.(target.dataset);
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'q') { state.query = e.target.value; const pos = e.target.selectionStart; render(); const q = document.getElementById('q'); q.focus(); q.setSelectionRange(pos, pos); }
+  if (e.target.dataset.f && state.draft) { state.draft[e.target.dataset.f] = e.target.value; if (e.target.dataset.f === 'price') { const n = document.getElementById('net'); const v = +e.target.value.replace(/\D/g, ''); n.innerHTML = `<div class="l"><span>Comisión (${MARKET.sellerCommissionPct * 100}%, ejemplo)</span><span>${v ? '− ' + fmt(v * MARKET.sellerCommissionPct) : '—'}</span></div><div class="l total"><span>Recibís</span><span>${v ? fmt(v * (1 - MARKET.sellerCommissionPct)) : '—'}</span></div>`; } }
+});
+document.addEventListener('change', e => { if (e.target.tagName === 'SELECT' && e.target.dataset.f && state.draft) { state.draft[e.target.dataset.f] = e.target.value; render(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'msg') document.querySelector('[data-a="send"]')?.click(); });
+
+render(true);
+</script>
+</body>
+</html>
